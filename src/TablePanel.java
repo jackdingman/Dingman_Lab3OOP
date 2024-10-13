@@ -22,9 +22,8 @@ public class TablePanel extends JPanel {
     JCheckBox manufacturingCheckBox; // for filtering data
     JCheckBox businessCheckBox;// for filtering by business industries
     JCheckBox corporateCheckBox; // for filtering my corporate industries
-    List <DataAggregate> dataPoints; // for storing
-    List <DataAggregate> filteredDataPoints;
-
+    List<DataAggregate> dataPoints; // for storing
+    List<DataAggregate> filteredDataPoints;
 
 
     public TablePanel(ArrayList<DataAggregate> sectorInformationAggregate) {
@@ -33,34 +32,78 @@ public class TablePanel extends JPanel {
 
         setLayout(new BorderLayout());
         String[] columns = {"Sector", "Employee count (in millions)", "Basis"};
-        model = new DefaultTableModel(columns, 0);
+        model = new DefaultTableModel(new Object[]{"Sector", "Employee Count (in millions)", "Basis"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) { //overridden method keeps cells containing info from being edited
+                return false;
+            }
+        };
         table = new JTable(model);
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        table.getColumnModel().getColumn(0).setHeaderValue("Sector");           //these are not working. Test later to get column titles
+        table.getColumnModel().getColumn(1).setHeaderValue("Employee Count");
+        table.getColumnModel().getColumn(2).setHeaderValue("Basis");
+
+        //table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         //table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         model.setRowCount(0); // clears the table
-        //model.setColumnCount(0);
-        for(DataAggregate d : dataPoints) { // sets points from the new data points list, populated from the Data Aggregate array list
+        for (DataAggregate d : dataPoints) { // sets points from the new data points list, populated from the Data Aggregate array list
             model.addRow(new Object[]{d.getSector(), d.getYearMillions(), d.getBasis()});
         }
-        JFrame frame = new JFrame();
-        add(table, BorderLayout.CENTER);
 
         dropDown = new JComboBox<>(new String[]{"Sort by Name", "Sort by Millions of Jobs"});
-        manufacturingCheckBox = new JCheckBox("Manufacturing");
-        businessCheckBox = new JCheckBox("Business");
-        corporateCheckBox = new JCheckBox("Corporate");
+        manufacturingCheckBox = new JCheckBox("MANUFACTURING");
+        businessCheckBox = new JCheckBox("BUSINESS");
+        corporateCheckBox = new JCheckBox("CORPORATE");
 
-        JPanel filter = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel filter = new JPanel(new FlowLayout(FlowLayout.CENTER));
         filter.add(manufacturingCheckBox);
         filter.add(businessCheckBox);
         filter.add(corporateCheckBox);
 
+        manufacturingCheckBox.addActionListener(new FilterDataListener() {
+        });
+        businessCheckBox.addActionListener(new FilterDataListener() {
+        });
+        corporateCheckBox.addActionListener(new FilterDataListener() {
+        });
+
+        add(table, BorderLayout.CENTER);
+        add(filter, BorderLayout.SOUTH);
 
 
+    }
+
+    private class FilterDataListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            filteredDataPoints.clear();
+            for (DataAggregate d : dataPoints) {
+                boolean found = false;
+                if (manufacturingCheckBox.isSelected() && d.getSector().toUpperCase().contains("MANUFACTURING")) {
+                    found = true;
+                }
+                if (businessCheckBox.isSelected() && d.getSector().toUpperCase().contains("BUSINESS")) {
+                    found = true;
+                }
+                if (corporateCheckBox.isSelected() && d.getSector().toUpperCase().contains("CORPORATE")) {
+                    found = true;
+                }
+                if (!corporateCheckBox.isSelected() && !manufacturingCheckBox.isSelected() && !businessCheckBox.isSelected()) {
+                    found = true;
+                }
+                if (found) {
+                    filteredDataPoints.add(d);
+                }
+
+            }
+
+            model.setRowCount(0);
+            for (DataAggregate d : filteredDataPoints) {
+                model.addRow(new Object[]{d.getSector(), d.getYearMillions(), d.getBasis()});
 
 
-
-
+            }
+        }
     }
 }
