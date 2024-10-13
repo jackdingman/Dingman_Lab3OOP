@@ -1,9 +1,9 @@
 public class DataAggregate {
     String sector;
-    String yearMillions;
+    Double yearMillions;
     String basis;
 
-    public DataAggregate(String sector, String yearMillions, String basis) {
+    public DataAggregate(String sector, Double yearMillions, String basis) {
         this.sector = sector;
         this.yearMillions = yearMillions;
         this.basis = basis;
@@ -11,7 +11,7 @@ public class DataAggregate {
     public String getSector() {
         return sector;
     }
-    public String getYearMillions() {
+    public Double getYearMillions() {
         return yearMillions;
     }
     public String getBasis() {
