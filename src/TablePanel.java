@@ -34,7 +34,7 @@ public class TablePanel extends JPanel {
         String[] columns = {"Sector", "Employee count (in millions)", "Basis"};
         model = new DefaultTableModel(new Object[]{"Sector", "Employee Count (in millions)", "Basis"}, 0) {
             @Override
-            public boolean isCellEditable(int row, int column) { //overridden method keeps cells containing info from being edited
+            public boolean isCellEditable(int row, int column) { //overridden method keeps cells in table, containing info, from being edited
                 return false;
             }
         };
@@ -52,6 +52,7 @@ public class TablePanel extends JPanel {
         }
 
         dropDown = new JComboBox<>(new String[]{"Sort by Name", "Sort by Millions of Jobs"});
+
         manufacturingCheckBox = new JCheckBox("MANUFACTURING");
         businessCheckBox = new JCheckBox("BUSINESS");
         corporateCheckBox = new JCheckBox("CORPORATE");

@@ -1,2 +1,46 @@
-public class StatsPanel {
+import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
+
+public class StatsPanel extends JPanel {
+    public StatsPanel(ArrayList<DataAggregate> sectorInformationAggregate, ArrayList<String> sectors, ArrayList<Double> averageWeeklyHours, ArrayList<Double> employmentPercentChange
+            ,ArrayList<Double> averageDollarsPerHour) {
+
+        setLayout(new GridLayout(6, 3)); // layout for panel - 4 columns include Sector, and three different calculated data points
+
+        /*Below will be the formulas for the different stats I am including.
+          They are as follows:
+          Previous year (2022) employment number = Employment # - Employment #(%change)
+          Total Employee payout on one hour of work = Employment #(current $ per hour worked)
+          Average $ per worker per week = Average weekly hours (current $ per hour worked)
+         */
+        //Header labels for data columns
+        add(new JLabel ("Sector: "));
+        add(new JLabel("Previous Year (2022) Employment Number (in millions): "));
+        add(new JLabel("Total Sector Employee Payout on one hour of work (in millions): "));
+        add(new JLabel("Average Dollars per worker per week: "));
+
+        for(int i = 0; i < 4; i++){
+            DataAggregate data = sectorInformationAggregate.get(i);
+            double weeklyHours = averageWeeklyHours.get(i);
+            double employmentPercent = employmentPercentChange.get(i);
+            double averageDollars = averageDollarsPerHour.get(i);
+            double employmentCount = data.getYearMillions();
+            String sectorName = sectors.get(i);
+
+            double previousEmploymentCount = employmentCount-(employmentCount * (employmentPercent/100));
+            double oneHourEmployeePayout = employmentCount * averageDollars;
+            double averageDollarPerWorkerPerWeek = weeklyHours * averageDollars;
+
+            add (new JButton(sectorName));
+            add (new JLabel(""+previousEmploymentCount));
+            add (new JLabel(""+oneHourEmployeePayout));
+            add (new JLabel(""+ averageDollarPerWorkerPerWeek));
+
+        }
+
+
+    }
+
+
 }

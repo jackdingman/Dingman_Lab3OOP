@@ -109,12 +109,12 @@ public class InputStream {
         frame.getContentPane().add(tablePanel, BorderLayout.CENTER);
         frame.setVisible(true);
 
-        JFrame frame2 = new JFrame();
+        JFrame frame2 = new JFrame(); //Second frame featuring chart + aggregate stats and links to details panels
         frame2.setTitle("Charting and Calculated Stats");
         frame2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame2.getContentPane().setLayout(new BorderLayout());
 
-        ChartTable chartPanel = new ChartTable(sectorInformationAggregate);
+        ChartTable chartPanel = new ChartTable(sectorInformationAggregate, sectors, averageWeeklyHours, employmentPercentChange, averageDollarsPerHour);
         chartPanel.setVisible(true);
 
 
