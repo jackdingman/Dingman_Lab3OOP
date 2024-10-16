@@ -3,10 +3,35 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class StatsPanel extends JPanel {
-    public StatsPanel(ArrayList<DataAggregate> sectorInformationAggregate, ArrayList<String> sectors, ArrayList<Double> averageWeeklyHours, ArrayList<Double> employmentPercentChange
-            ,ArrayList<Double> averageDollarsPerHour) {
+
+    /*ArrayList<DataAggregate> sectorInformationAggregate;
+    ArrayList<String> sectors;
+    ArrayList<Double> averageWeeklyHours;
+    ArrayList<Double> employmentPercentChange;
+    ArrayList<Double> averageDollarsPerHour;*/
+
+
+    public StatsPanel(ArrayList<DataAggregate> sectorInformationAggregate/*, ArrayList<String> sectors, ArrayList<Double> averageWeeklyHours, ArrayList<Double> employmentPercentChange
+            ,ArrayList<Double> averageDollarsPerHour*/) {
+
+        /*this.sectorInformationAggregate = sectorInformationAggregate;
+        this.sectors = sectors;
+        this.averageWeeklyHours = averageWeeklyHours;
+        this.employmentPercentChange = employmentPercentChange;
+        this.averageDollarsPerHour = averageDollarsPerHour;*/
 
         setLayout(new GridLayout(6, 3)); // layout for panel - 4 columns include Sector, and three different calculated data points
+
+        updateStats(sectorInformationAggregate/*, sectors, averageWeeklyHours, employmentPercentChange, averageDollarsPerHour*/);
+
+
+
+
+    }
+    public void updateStats(ArrayList<DataAggregate> sectorInformationAggregate/*, ArrayList<String> sectors, ArrayList<Double> averageWeeklyHours, ArrayList<Double> employmentPercentChange
+            ,ArrayList<Double> averageDollarsPerHour*/){
+
+        removeAll();
 
         /*Below will be the formulas for the different stats I am including.
           They are as follows:
@@ -20,26 +45,27 @@ public class StatsPanel extends JPanel {
         add(new JLabel("Total Sector Employee Payout on one hour of work (in millions): "));
         add(new JLabel("Average Dollars per worker per week: "));
 
-        for(int i = 0; i < 4; i++){
+        for(int i = 0; i < 4; i++) {
             DataAggregate data = sectorInformationAggregate.get(i);
-            double weeklyHours = averageWeeklyHours.get(i);
-            double employmentPercent = employmentPercentChange.get(i);
-            double averageDollars = averageDollarsPerHour.get(i);
+            double weeklyHours = data.getAverageWeeklyHours();
+            double employmentPercent = data.getEmploymentPercentChange();
+            double averageDollars = data.getAverageDollarsPerHour();
             double employmentCount = data.getYearMillions();
-            String sectorName = sectors.get(i);
+            String sectorName = data.getSector();
 
-            double previousEmploymentCount = employmentCount-(employmentCount * (employmentPercent/100));
+            double previousEmploymentCount = employmentCount - (employmentCount * (employmentPercent / 100));
             double oneHourEmployeePayout = employmentCount * averageDollars;
             double averageDollarPerWorkerPerWeek = weeklyHours * averageDollars;
 
-            add (new JButton(sectorName));
-            add (new JLabel(""+previousEmploymentCount));
-            add (new JLabel(""+oneHourEmployeePayout));
-            add (new JLabel(""+ averageDollarPerWorkerPerWeek));
+            add(new JButton(sectorName));
+            add(new JLabel("" + previousEmploymentCount));
+            add(new JLabel("" + oneHourEmployeePayout));
+            add(new JLabel("" + averageDollarPerWorkerPerWeek));
+
+            revalidate();
+            repaint();
 
         }
-
-
     }
 
 

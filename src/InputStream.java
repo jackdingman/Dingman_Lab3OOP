@@ -25,34 +25,16 @@ public class InputStream {
     String sector;
     String yearMillions;
 
+
     public InputStream() {
 
     }
 
     //public void Streamer(String file) {
     public static void main(String[] args) {
-        String file1 = "data2.csv";   //file object
+        String file1;   //file object
         String line;
         String delimiter = ","; //for acknowledging the separation between columns
-
-        /*try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file1))) {
-            while ((line = bufferedReader.readLine()) != null) { //repeats while there are still lines to read
-                String[] columns = line.split(delimiter); // The whole line is segmented based on comma locations. Allows each cell to be separately tracked.
-                String sector = columns[0]; // different job types I'll be graphing
-                String digit = columns[3]; // the more the digit, the more precise the job is within the certain industry. For example - Mining: 2-digit, Support Activities for mining, 3-digit
-                String measure = columns[5]; //"Employment" within csv file
-                String units = columns[6]; // for "Thousands of jobs"
-                String yearMillions = columns[43]; //tracks the column that holds millions of employees, for year 2023.
-                if ("Employment".equals(measure) && "Thousands of jobs".equals(units) && "2-Digit".equals(digit)) {
-                    System.out.println("Sector: " + sector);
-                    System.out.println("National Employees (in thousands): " + yearMillions);
-                }
-            }
-
-        } catch (IOException e) { // used in case the program cannot find the file; results in a thrown error
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }*/
 
         file1 = "data.csv";
 
@@ -62,6 +44,16 @@ public class InputStream {
         ArrayList<Double> employmentPercentChange = new ArrayList<>();
         ArrayList<Double> averageDollarsPerHour = new ArrayList<>();
         ArrayList<String> sectors = new ArrayList<>();
+        ArrayList<String> basisArray = new ArrayList<>();
+
+        //Need to restructure logic to send all data points to the DataAggregate class. This will make updating my panels easier.
+        //These temporary variables will be used to create a DataAggregate object containing all necessary data.
+        String currentSector = "";
+        String currentBasis = "";
+        double currentEmploymentCount = 0.0;
+        double currentAverageWeeklyHours = 0.0;
+        double currentEmploymentPercentChange = 0.0;
+        double currentAverageDollarsPerHour = 0.0;
 
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file1))) {
             while ((line = bufferedReader.readLine()) != null) { //repeats while there are still lines to read
@@ -70,25 +62,39 @@ public class InputStream {
                 String basis = columns[1]; // basis of the data: can be either employees or all workers
                 String measure = columns[2]; //String: "Employment" within csv file
                 String units = columns[3]; // column holding string: "Millions of jobs"
-                String yearMillions = columns[80]; //tracks the column that counts the millions of employees, for year 2023.
+                String yearMillions = columns[80]; //tracks the column that counts the Employees, for year 2023.
+
                 if ("Employment".equals(measure) && "Millions of jobs".equals(units)) {
                     System.out.println("Sector: " + sector);
                     System.out.println("National Employees (in millions): " + yearMillions);
-                    double employeesInMillions = Double.parseDouble(yearMillions);
-                    DataAggregate data = new DataAggregate(sector, employeesInMillions, basis); // new data aggregate object
-                    sectorInformationAggregate.add(data); //add the different data points to an array list for processing
-                    sectors.add(columns[0]);
-                    employmentTotal.add(Double.parseDouble(columns[80]));
+                    currentSector = sector;
+                    currentBasis = basis;
+                    currentEmploymentCount = Double.parseDouble(yearMillions);
+                    sectors.add(sector);
+                    basisArray.add(basis);
                 }
                 if("Employment".equals(measure)&&"% Change from previous year".equals(units)) { // when column says Employment and other column says % change, add to array list
-                    employmentPercentChange.add(Double.parseDouble(columns[80])); // 80th column statistic will represent 2023 value
+                    currentEmploymentPercentChange = Double.parseDouble(columns[80]);
                 }
                 if("Average weekly hours".equals(measure)&&"Hours worked per job per week".equals(units)) {
-                    averageWeeklyHours.add(Double.parseDouble(columns[80]));
+                    currentAverageWeeklyHours = (Double.parseDouble(columns[80]));
                 }
                 if("Hourly compensation".equals(measure)&&"Current dollars per hour worked".equals(units)) {
-                    averageDollarsPerHour.add(Double.parseDouble(columns[80]));
+                    currentAverageDollarsPerHour = (Double.parseDouble(columns[80]));
                 }
+                if(!currentSector.isEmpty() && !currentBasis.isEmpty() && currentEmploymentPercentChange!=0 && currentAverageWeeklyHours!=0 && currentEmploymentCount!=0) { // Makes sure that all values for an industry data point are filled
+                    DataAggregate data = new DataAggregate(currentSector, currentEmploymentCount, currentBasis, currentAverageWeeklyHours, currentEmploymentPercentChange, currentAverageDollarsPerHour);
+                    sectorInformationAggregate.add(data);
+
+                    currentSector = ""; //reset values for next DataAggregate data point.
+                    currentEmploymentCount = 0.0;
+                    currentAverageWeeklyHours = 0.0;
+                    currentEmploymentPercentChange = 0.0;
+                    currentAverageDollarsPerHour = 0.0;
+
+                }
+
+
             }
 
         } catch (IOException e) { // used in case the program cannot find the file; results in a thrown error
@@ -114,7 +120,7 @@ public class InputStream {
         frame2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame2.getContentPane().setLayout(new BorderLayout());
 
-        ChartTable chartPanel = new ChartTable(sectorInformationAggregate, sectors, averageWeeklyHours, employmentPercentChange, averageDollarsPerHour);
+        ChartTable chartPanel = new ChartTable(sectorInformationAggregate/*, sectors, averageWeeklyHours, employmentPercentChange, averageDollarsPerHour*/);
         chartPanel.setVisible(true);
 
 

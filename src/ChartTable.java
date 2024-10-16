@@ -10,8 +10,8 @@ import java.awt.*;
 
 public class ChartTable extends JFrame {
     JFrame chart;
-    public ChartTable(ArrayList<DataAggregate> sectorInformationAggregate, ArrayList<String> sectors, ArrayList<Double> averageWeeklyHours, ArrayList<Double> employmentPercentChange
-            ,ArrayList<Double> averageDollarsPerHour) {
+    public ChartTable(ArrayList<DataAggregate> sectorInformationAggregate/*, ArrayList<String> sectors, ArrayList<Double> averageWeeklyHours, ArrayList<Double> employmentPercentChange
+            ,ArrayList<Double> averageDollarsPerHour*/) {
         setTitle("Employee Count (in millions) by Sector");
         setSize(800, 600);
         setLocationRelativeTo(null);
@@ -40,7 +40,7 @@ public class ChartTable extends JFrame {
         setLayout(new BorderLayout());
         add(chartPanel, BorderLayout.NORTH);
 
-        StatsPanel statsPanel = new StatsPanel(sectorInformationAggregate, sectors, averageWeeklyHours, employmentPercentChange, averageDollarsPerHour);
+        StatsPanel statsPanel = new StatsPanel(sectorInformationAggregate/*, sectors, averageWeeklyHours, employmentPercentChange, averageDollarsPerHour*/);
         add(statsPanel, BorderLayout.CENTER);
 
         setSize(800, 800);

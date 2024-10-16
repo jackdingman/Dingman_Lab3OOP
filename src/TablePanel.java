@@ -11,13 +11,17 @@ There will be the option to sort by millions of jobs, or by name
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class TablePanel extends JPanel {
     JTable table; // summarized data points with employment titles
     DefaultTableModel model;
+    StatsPanel statsPanel; // will be used for checkmark logic and filtering on the other panel
     JComboBox<String> dropDown; // for sorting by name or millions of jobs
     JCheckBox manufacturingCheckBox; // for filtering data
     JCheckBox businessCheckBox;// for filtering by business industries
@@ -39,19 +43,46 @@ public class TablePanel extends JPanel {
             }
         };
         table = new JTable(model);
-        table.getColumnModel().getColumn(0).setHeaderValue("Sector");           //these are not working. Test later to get column titles
-        table.getColumnModel().getColumn(1).setHeaderValue("Employee Count");
-        table.getColumnModel().getColumn(2).setHeaderValue("Basis");
+
 
         //table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         //table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         model.setRowCount(0); // clears the table
+        table.getColumnModel().getColumn(0).setHeaderValue("Sector");           //these are not working. Test later to get column titles
+        table.getColumnModel().getColumn(1).setHeaderValue("Employee Count");
+        table.getColumnModel().getColumn(2).setHeaderValue("Basis");
+
         for (DataAggregate d : dataPoints) { // sets points from the new data points list, populated from the Data Aggregate array list
             model.addRow(new Object[]{d.getSector(), d.getYearMillions(), d.getBasis()});
         }
 
-        dropDown = new JComboBox<>(new String[]{"Sort by Name", "Sort by Millions of Jobs"});
+        dropDown = new JComboBox<>(new String[]{"Sort by Name", "Sort by Millions of Jobs"}); //dropdown menu for sorting by different specs
+        dropDown.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String select = (String) dropDown.getSelectedItem(); // cast dropdown selected item as String
+                if (select.equals("Sort by Name")) { // Following compare method sorts rows by sector name
+                    Collections.sort(dataPoints,new Comparator<DataAggregate>() {
+                      @Override
+                      public int compare(DataAggregate o1, DataAggregate o2) {
+                          return o1.getSector().compareTo(o2.getSector());
+                      }
+                    });
+                }
+                if (select.equals("Sort by Millions of Jobs")) { // sorts rows by millions of jobs, incresasing
+                  Collections.sort(dataPoints, new Comparator<DataAggregate>() {
+                      @Override
+                      public int compare(DataAggregate o1, DataAggregate o2) {
+                          return o1.getYearMillions().compareTo(o2.getYearMillions());
+                      }
+                  });
+                }
+                model.setRowCount(0); //wipes out the existing rows for reformating
+                for (DataAggregate d : dataPoints) { //updates table with new organization
+                    model.addRow(new Object[]{d.getSector(), d.getYearMillions(), d.getBasis()});
+                }
+            }
+        });
 
         manufacturingCheckBox = new JCheckBox("MANUFACTURING");
         businessCheckBox = new JCheckBox("BUSINESS");
@@ -61,6 +92,7 @@ public class TablePanel extends JPanel {
         filter.add(manufacturingCheckBox);
         filter.add(businessCheckBox);
         filter.add(corporateCheckBox);
+        filter.add(dropDown);
 
         manufacturingCheckBox.addActionListener(new FilterDataListener() {
         });
@@ -78,7 +110,7 @@ public class TablePanel extends JPanel {
     private class FilterDataListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            filteredDataPoints.clear();
+            filteredDataPoints.clear(); // clear the list full of filtered data points, so they can be repopulated based on this round's checkboxes
             for (DataAggregate d : dataPoints) {
                 boolean found = false;
                 if (manufacturingCheckBox.isSelected() && d.getSector().toUpperCase().contains("MANUFACTURING")) {
@@ -94,17 +126,20 @@ public class TablePanel extends JPanel {
                     found = true;
                 }
                 if (found) {
-                    filteredDataPoints.add(d);
+                    filteredDataPoints.add(d); //DataAggregate points are added to place on the table.
                 }
 
             }
 
-            model.setRowCount(0);
-            for (DataAggregate d : filteredDataPoints) {
+            model.setRowCount(0); //reset table
+            for (DataAggregate d : filteredDataPoints) { //put new filtered data points on table
                 model.addRow(new Object[]{d.getSector(), d.getYearMillions(), d.getBasis()});
 
-
             }
+            //updateStatsPanel(); // used for updating the calculated stats filter on the StatsPanel.
         }
     }
+   /*public void updateStatsPanel() {
+        statsPanel.updateStats(filteredDataPoints);
+   }*/
 }
