@@ -46,13 +46,11 @@ public class TablePanel extends JPanel {
         };
         table = new JTable(model);
 
-
-        //table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        //table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        JScrollPane scrollPane = new JScrollPane(table);
 
         model.setRowCount(0); // clears the table
         table.getColumnModel().getColumn(0).setHeaderValue("Sector");           //these are not working. Test later to get column titles
-        table.getColumnModel().getColumn(1).setHeaderValue("Employee Count");
+        table.getColumnModel().getColumn(1).setHeaderValue("Employee Count (in millions)");
         table.getColumnModel().getColumn(2).setHeaderValue("Basis");
 
         for (DataAggregate d : dataPoints) { // sets points from the new data points list, populated from the Data Aggregate array list
@@ -110,7 +108,7 @@ public class TablePanel extends JPanel {
         corporateCheckBox.addActionListener(new FilterDataListener() {
         });
 
-        add(table, BorderLayout.CENTER);
+        add(scrollPane, BorderLayout.CENTER);
         add(filter, BorderLayout.SOUTH);
 
         //ChartTable chartPanel = new ChartTable(sectorInformationAggregate/*, sectors, averageWeeklyHours, employmentPercentChange, averageDollarsPerHour*/);
