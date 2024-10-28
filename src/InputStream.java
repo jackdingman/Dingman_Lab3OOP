@@ -18,16 +18,11 @@ import java.util.List;
 import java.util.ArrayList;
 import java.io.File;
 
-
-
-
 public class InputStream {
     String sector;
     String yearMillions;
 
-
     public InputStream() {
-
     }
 
     //public void Streamer(String file) {
@@ -39,10 +34,6 @@ public class InputStream {
         file1 = "data.csv";
 
         ArrayList<DataAggregate> sectorInformationAggregate = new ArrayList<>(); //for storing data to put on TablePanel
-        ArrayList<Double> employmentTotal = new ArrayList<>();
-        ArrayList<Double> averageWeeklyHours = new ArrayList<>();
-        ArrayList<Double> employmentPercentChange = new ArrayList<>();
-        ArrayList<Double> averageDollarsPerHour = new ArrayList<>();
         ArrayList<String> sectors = new ArrayList<>();
         ArrayList<String> basisArray = new ArrayList<>();
 
@@ -115,13 +106,7 @@ public class InputStream {
         frame.getContentPane().add(tablePanel, BorderLayout.CENTER);
         frame.setVisible(true);
 
-        JFrame frame2 = new JFrame(); //Second frame featuring chart + aggregate stats and links to details panels
-        frame2.setTitle("Charting and Calculated Stats");
-        frame2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame2.getContentPane().setLayout(new BorderLayout());
 
-        ChartTable chartPanel = new ChartTable(sectorInformationAggregate/*, sectors, averageWeeklyHours, employmentPercentChange, averageDollarsPerHour*/);
-        chartPanel.setVisible(true);
 
 
 

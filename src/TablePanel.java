@@ -13,7 +13,8 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -26,13 +27,14 @@ public class TablePanel extends JPanel {
     JCheckBox manufacturingCheckBox; // for filtering data
     JCheckBox businessCheckBox;// for filtering by business industries
     JCheckBox corporateCheckBox; // for filtering my corporate industries
-    List<DataAggregate> dataPoints; // for storing
-    List<DataAggregate> filteredDataPoints;
+    ArrayList<DataAggregate> dataPoints; // for storing
+    ArrayList<DataAggregate> filteredDataPoints;
 
 
     public TablePanel(ArrayList<DataAggregate> sectorInformationAggregate) {
         this.dataPoints = sectorInformationAggregate; // initialization. Pulling arraylist containing information and saving it within current object.
         this.filteredDataPoints = new ArrayList<>(dataPoints); // new ArrayList object for later filtering
+
 
         setLayout(new BorderLayout());
         String[] columns = {"Sector", "Employee count (in millions)", "Basis"};
@@ -54,28 +56,35 @@ public class TablePanel extends JPanel {
         table.getColumnModel().getColumn(2).setHeaderValue("Basis");
 
         for (DataAggregate d : dataPoints) { // sets points from the new data points list, populated from the Data Aggregate array list
-            model.addRow(new Object[]{d.getSector(), d.getYearMillions(), d.getBasis()});
+            model.addRow(new Object[]{d.getSector(),d.getYearMillions(), d.getBasis()});
+
         }
+        table.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+            int row = table.rowAtPoint(e.getPoint());
+            if (row != -1) {
+                DataAggregate displayData = filteredDataPoints.get(row);
+                DetailsPanel detailer = new DetailsPanel();
+                detailer.displayDetails(displayData);
+                detailer.setVisible(true);
+            }
+            }
+        });
 
         dropDown = new JComboBox<>(new String[]{"Sort by Name", "Sort by Millions of Jobs"}); //dropdown menu for sorting by different specs
         dropDown.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String select = (String) dropDown.getSelectedItem(); // cast dropdown selected item as String
                 if (select.equals("Sort by Name")) { // Following compare method sorts rows by sector name
-                    Collections.sort(dataPoints,new Comparator<DataAggregate>() {
-                      @Override
-                      public int compare(DataAggregate o1, DataAggregate o2) {
-                          return o1.getSector().compareTo(o2.getSector());
-                      }
-                    });
+                    Collections.sort(dataPoints, (o1, o2) -> o1.getSector().compareTo(o2.getSector()));
                 }
                 if (select.equals("Sort by Millions of Jobs")) { // sorts rows by millions of jobs, incresasing
-                  Collections.sort(dataPoints, new Comparator<DataAggregate>() {
-                      @Override
-                      public int compare(DataAggregate o1, DataAggregate o2) {
-                          return o1.getYearMillions().compareTo(o2.getYearMillions());
-                      }
-                  });
+                    Collections.sort(dataPoints, new Comparator<>() {
+                        @Override
+                        public int compare(DataAggregate o1, DataAggregate o2) {
+                            return o1.getYearMillions().compareTo(o2.getYearMillions());
+                        }
+                    });
                 }
                 model.setRowCount(0); //wipes out the existing rows for reformating
                 for (DataAggregate d : dataPoints) { //updates table with new organization
@@ -103,6 +112,11 @@ public class TablePanel extends JPanel {
 
         add(table, BorderLayout.CENTER);
         add(filter, BorderLayout.SOUTH);
+
+        //ChartTable chartPanel = new ChartTable(sectorInformationAggregate/*, sectors, averageWeeklyHours, employmentPercentChange, averageDollarsPerHour*/);
+        //chartPanel.setVisible(true);
+
+        updateChartPanel(sectorInformationAggregate);
 
 
     }
@@ -133,13 +147,19 @@ public class TablePanel extends JPanel {
 
             model.setRowCount(0); //reset table
             for (DataAggregate d : filteredDataPoints) { //put new filtered data points on table
-                model.addRow(new Object[]{d.getSector(), d.getYearMillions(), d.getBasis()});
+                model.addRow(new Object[]{d.getSector(), d.getYearMillions(), d.getBasis(), d.getAverageDollarsPerHour(), d.getAverageWeeklyHours(), d.getEmploymentPercentChange()});
 
             }
-            //updateStatsPanel(); // used for updating the calculated stats filter on the StatsPanel.
+            updateChartPanel(filteredDataPoints);
         }
+
     }
-   /*public void updateStatsPanel() {
-        statsPanel.updateStats(filteredDataPoints);
-   }*/
+
+        public void updateChartPanel(ArrayList<DataAggregate> sectorInformationAggregate) {
+
+            ChartTable chartTable = new ChartTable(sectorInformationAggregate);
+            chartTable.updateChart(sectorInformationAggregate);
+
+        }
+
 }

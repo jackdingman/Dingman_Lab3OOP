@@ -9,19 +9,26 @@ import java.util.ArrayList;
 import java.awt.*;
 
 public class ChartTable extends JFrame {
-    JFrame chart;
-    public ChartTable(ArrayList<DataAggregate> sectorInformationAggregate/*, ArrayList<String> sectors, ArrayList<Double> averageWeeklyHours, ArrayList<Double> employmentPercentChange
-            ,ArrayList<Double> averageDollarsPerHour*/) {
-        setTitle("Employee Count (in millions) by Sector");
-        setSize(800, 600);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    JFrame frame;
+    ChartPanel chartPanel;
+
+
+    public ChartTable(ArrayList<DataAggregate> sectorInformationAggregate) {
+        frame = new JFrame(); //initializes a new JFrame obhect
+        frame.setSize(800, 600); //sets size
+        frame.setLocationRelativeTo(null);//centers frame
+        frame.setTitle("Employee Count (in millions) by Sector"); // title for frame
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        updateChart(sectorInformationAggregate); //method for updating chart data, passing sectorInformationAggregate containing Excel data.
+    }
+    public void updateChart(ArrayList<DataAggregate> sectorInformationAggregate) {
 
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
         for (DataAggregate dataAggregate : sectorInformationAggregate) {
-            String sector = dataAggregate.getSector();
-            Double employeesInMillions = dataAggregate.getYearMillions();
-            dataset.addValue(employeesInMillions,sector, "Employment"); // employees in millions is y axis, sectors are x axis
+            String sector = dataAggregate.getSector(); //retrieve sector
+            Double employeesInMillions = dataAggregate.getYearMillions(); //retrieve millions of employees
+            dataset.addValue(employeesInMillions, sector, "Employment"); // employees in millions is y axis, sectors are x axis
         }
 
         JFreeChart barChart = ChartFactory.createBarChart(
@@ -29,26 +36,25 @@ public class ChartTable extends JFrame {
                 "Sector", // x axis
                 "Millions of Jobs", // y axis
                 dataset, // created dataset using JFree
-                PlotOrientation.VERTICAL,
-                true,
-                true,
+                PlotOrientation.VERTICAL, //chart display structure
+                true, //legend
+                true, //tooltips
                 false
         );
 
-        ChartPanel chartPanel = new ChartPanel(barChart);
-        chartPanel.setPreferredSize(new Dimension(800, 600));
-        setLayout(new BorderLayout());
-        add(chartPanel, BorderLayout.NORTH);
+        if (chartPanel == null){ // checks if the chartPanel has been initialized
+            chartPanel = new ChartPanel(barChart); //initialize
+            chartPanel.setPreferredSize(new Dimension(800, 600));
+            frame.getContentPane().add(chartPanel, BorderLayout.NORTH); //add chartPanel to frame
+        } else {
+            chartPanel.setChart(barChart);
+        }
+
 
         StatsPanel statsPanel = new StatsPanel(sectorInformationAggregate/*, sectors, averageWeeklyHours, employmentPercentChange, averageDollarsPerHour*/);
-        add(statsPanel, BorderLayout.CENTER);
+        frame.getContentPane().add(statsPanel, BorderLayout.CENTER);
 
-        setSize(800, 800);
-        setVisible(true);
-
-
-
-
-
+        frame.pack();
+        frame.setVisible(true);
     }
 }
